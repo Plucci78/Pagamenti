@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <title>Ricevuta di Pagamento</title>
+  <style>
+    /* Stili CSS per la ricevuta (adatta ai tuoi gusti) */
+    body { font-family: sans-serif; }
+    .container { width: 80%; margin: 0 auto; }
+    .header { text-align: center; }
+    .details { margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Ricevuta di Pagamento</h1>
+    </div>
+
+    <div class="details">
+      <p><strong>ID Ricevuta:</strong> <?!= pagamento.id ?></p>
+      <p><strong>Data:</strong> <?!= pagamento.dataPagamento ?></p>
+      <p><strong>Importo Pagato:</strong> <?!= pagamento.importoPagato ?></p>
+      <p><strong>Metodo di Pagamento:</strong> <?!= pagamento.metodoPagamento ?></p>
+      <p><strong>Riferimento:</strong> <?!= pagamento.riferimento ?></p>
+      <p><strong>Note:</strong> <?!= pagamento.note ?></p>
+    </div>
+
+    <div class="details">
+      <h2>Dettagli Fattura</h2>
+      <p><strong>ID Fattura:</strong> <?!= fattura.id ?></p>
+      <p><strong>Data Emissione:</strong> <?!= fattura.dataEmissione ?></p>
+      <p><strong>Importo Totale:</strong> <?!= fattura.importoTotale ?></p>
+      <p><strong>Importo Pagato:</strong> <?!= fattura.importoPagato ?></p>
+      <p><strong>Stato:</strong> <?!= fattura.stato ?></p>
+    </div>
+
+    <p>Grazie!</p>
+  </div>
+</body>
+</html>
