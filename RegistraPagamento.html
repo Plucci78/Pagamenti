@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <title>Registra Pagamento</title>
+  <style>
+    /* Stili CSS per il form (adatta ai tuoi gusti) */
+    body { font-family: sans-serif; }
+    label { display: block; margin-top: 10px; }
+    input[type="text"], input[type="date"], input[type="number"], select, textarea {
+      width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box;
+    }
+    button { margin-top: 20px; padding: 10px 20px; }
+    #statusMessage { margin-top: 20px; font-weight: bold; }
+
+    /* Stili per la modale */
+    .modal {
+      display: none; /* Hidden by default */
+      position: fixed; /* Stay in place */
+      z-index: 1; /* Sit on top */
+      left: 0;
+      top: 0;
+      width: 100%; /* Full width */
+      height: 100%; /* Full height */
+      overflow: auto; /* Enable scroll if needed */
+      background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+
+    /* Modal Content/Box */
+    .modal-content {
+      background-color: #fefefe;
+      margin: 15% auto; /* 15% from the top and centered */
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%; /* Could be more or less, depending on screen size */
+    }
+
+    /* The Close Button */
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="registraPagamentoModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="chiudiModal()">×</span>
+      <h1>Registra Pagamento</h1>
+      <p>Fattura ID: <span id="fatturaIdDisplay"></span></p> <!-- Mostra l'ID della fattura -->
+      <form id="registraPagamentoForm">
+        <label for="dataPagamento">Data Pagamento:</label>
+        <input type="date" id="dataPagamento" name="dataPagamento" required><br><br>
+
+        <label for="importoPagato">Importo Pagato:</label>
+        <input type="number" id="importoPagato" name="importoPagato" step="0.01" required><br><br>
+
+        <label for="metodoPagamento">Metodo Pagamento:</label>
+        <select id="metodoPagamento" name="metodoPagamento" required>
+          <option value="">Seleziona...</option>
+          <option value="Bonifico">Bonifico</option>
+          <option value="Contanti">Contanti</option>
+          <option value="Assegno">Assegno</option>
+          <!-- Aggiungi altri metodi di pagamento -->
+        </select><br><br>
+
+        <label for="riferimento">Riferimento (opzionale):</label>
+        <input type="text" id="riferimento" name="riferimento"><br><br>
+
+        <label for="note">Note (opzionale):</label>
+        <textarea id="note" name="note"></textarea><br><br>
+
+        <button type="button" onclick="registraPagamento()">Registra Pagamento</button>
+        <p id="statusMessage"></p>
+      </form>
+
+      <!-- Anteprima ricevuta (inizialmente nascosta) -->
+      <div id="anteprimaRicevuta" style="display:none;">
+        <h2>Anteprima Ricevuta</h2>
+        <div id="ricevutaContent"></div>
+        <button onclick="stampaRicevuta()">Stampa Ricevuta</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Funzioni per la modale
+    function apriModal(fatturaId) {
+      document.getElementById("fatturaIdDisplay").innerText = fatturaId;
+      document.getElementById("registraPagamentoModal").style.display = "block";
+    }
+
+    function chiudiModal() {
+      document.getElementById("registraPagamentoModal").style.display = "none";
+    }
+    
+    // Chiudi la modale se si clicca fuori
+    window.onclick = function(event) {
+      var modal = document.getElementById("registraPagamentoModal");
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
+
+    // Registra pagamento
+    function registraPagamento() {
+      const fatturaId = document.getElementById("fatturaIdDisplay").innerText;
+      const dataPagamento = document.getElementById("dataPagamento").value;
+      const importoPagato = document.getElementById("importoPagato").value;
+      const metodoPagamento = document.getElementById("metodoPagamento").value;
+      const riferimento = document.getElementById("riferimento").value;
+      const note = document.getElementById("note").value;
+
+      // Validazione (aggiungi validazione più robusta)
+      if (!fatturaId || !dataPagamento || !importoPagato || !metodoPagamento) {
+        document.getElementById("statusMessage").innerText = "Compila tutti i campi obbligatori!";
+        return;
+      }
+
+      google.script.run
+        .withSuccessHandler(function(result) {
+          if (result.success) {
+            document.getElementById("statusMessage").innerText = result.message;
+            document.getElementById("anteprimaRicevuta").style.display = "block";
+            document.getElementById("ricevutaContent").innerHTML = result.htmlRicevuta;
+          } else {
+            document.getElementById("statusMessage").innerText = "Errore: " + result.error;
+          }
+        })
+        .registraPagamento(fatturaId, dataPagamento, importoPagato, metodoPagamento, riferimento, note);
+    }
+
+    // Stampa ricevuta
+    function stampaRicevuta() {
+      var divContents = document.getElementById("ricevutaContent").innerHTML;
+      var a = window.open('', '', 'height=500, width=500');
+      a.document.write('<html>');
+      a.document.write('<body >');
+      a.document.write(divContents);
+      a.document.write('</body></html>');
+      a.document.close();
+      a.print();
+    }
+  </script>
+</body>
+</html>
